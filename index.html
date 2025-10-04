@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentient Airdrop Claimer - AI Powered Airdrop Discovery</title>
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --secondary: #06B6D4;
+            --accent: #10B981;
+            --danger: #EF4444;
+            --background: #0F0F23;
+            --surface: #1A1B2F;
+            --text: #FFFFFF;
+            --text-secondary: #CBD5E1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #1E1B4B 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(26, 27, 47, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .connect-wallet {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .connect-wallet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .connect-wallet.connected {
+            background: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 140px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Main App */
+        .app-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wallet-input-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .wallet-input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .wallet-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .wallet-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .research-btn {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .research-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .research-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-steps {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .loading-step {
+            text-align: center;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .loading-step.active {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        .step-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Results */
+        .results-section {
+            display: none;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .total-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .airdrop-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        }
+
+        .airdrop-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .airdrop-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .protocol-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .eligibility-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .eligible {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .not-eligible {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .airdrop-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-align: right;
+        }
+
+        .deadline {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .requirements {
+            margin: 1rem 0;
+        }
+
+        .requirement-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .claim-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .claim-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .claim-btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            transition: all 0.3s;
+            transform: translateX(400px);
+            opacity: 0;
+            max-width: 350px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        .notification.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        .notification.info {
+            background: rgba(59, 130, 246, 0.9);
+        }
+
+        .notification.warning {
+            background: rgba(245, 158, 11, 0.9);
+        }
+
+        /* Debug Info */
+        .debug-info {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .wallet-input-section {
+                flex-direction: column;
+            }
+            .airdrop-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="nav-container">
+                <div class="logo">🪂 Sentient Airdrop Claimer</div>
+                <button class="connect-wallet" id="connectWallet">Connect Wallet</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>AI-Powered Airdrop Discovery</h1>
+            <p>Automatically find and claim eligible airdrops using advanced AI research</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">250+</span>
+                    <span class="stat-label">Airdrops Tracked</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$2.5M+</span>
+                    <span class="stat-label">Total Value Claimed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15K+</span>
+                    <span class="stat-label">Active Users</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="app-section">
+            <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">Discover Your Airdrops</h2>
+            
+            <div class="wallet-input-section">
+                <input 
+                    type="text" 
+                    class="wallet-input" 
+                    id="walletAddress"
+                    placeholder="Enter your wallet address (0x...) or connect wallet above"
+                    value="0x8E72d5F2EF1DaC1c678B9260AcE"
+                />
+                <button class="research-btn" id="researchBtn">
+                    🔍 Research Airdrops
+                </button>
+            </div>
+
+            <!-- Debug Info -->
+            <div class="debug-info" id="debugInfo">
+                Debug information will appear here...
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loadingSection">
+                <div class="spinner"></div>
+                <h3>AI is researching your airdrop opportunities...</h3>
+                <p>Analyzing blockchain data across multiple protocols</p>
+                
+                <div class="loading-steps">
+                    <div class="loading-step active" id="step1">
+                        <div class="step-icon">🔍</div>
+                        <div>Scanning Wallet</div>
+                    </div>
+                    <div class="loading-step" id="step2">
+                        <div class="step-icon">🤖</div>
+                        <div>AI Analysis</div>
+                    </div>
+                    <div class="loading-step" id="step3">
+                        <div class="step-icon">✅</div>
+                        <div>Generating Report</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2 style="font-size: 1.8rem;">🎯 Found Airdrops</h2>
+                    <div class="total-value" id="totalValueDisplay">$0.00</div>
+                </div>
+
+                <div class="airdrop-grid" id="airdropGrid">
+                    <!-- Airdrop cards will appear here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            BACKEND_URL: 'http://localhost:3000',
+            ENABLE_DEBUG: true
+        };
+
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletAddressInput = document.getElementById('walletAddress');
+        const researchBtn = document.getElementById('researchBtn');
+        const loadingSection = document.getElementById('loadingSection');
+        const resultsSection = document.getElementById('resultsSection');
+        const airdropGrid = document.getElementById('airdropGrid');
+        const totalValueDisplay = document.getElementById('totalValueDisplay');
+        const debugInfo = document.getElementById('debugInfo');
+        const loadingSteps = ['step1', 'step2', 'step3'];
+
+        // State
+        let currentWallet = '';
+        let isResearching = false;
+
+        // Event Listeners
+        connectWalletBtn.addEventListener('click', connectWallet);
+        researchBtn.addEventListener('click', researchAirdrops);
+
+        // Debug logging
+        function debugLog(message, data = null) {
+            if (CONFIG.ENABLE_DEBUG) {
+                console.log(`🔧 ${message}`, data || '');
+                debugInfo.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+                debugInfo.style.display = 'block';
+            }
+        }
+
+        // Connect Wallet
+        async function connectWallet() {
+            try {
+                debugLog('Connecting wallet...');
+                
+                // Generate mock wallet address
+                const mockAddress = "0x" + Array(40).fill(0).map(() => 
+                    Math.floor(Math.random() * 16).toString(16)).join('');
+                
+                currentWallet = mockAddress;
+                walletAddressInput.value = mockAddress;
+                
+                connectWalletBtn.textContent = "Connected ✓";
+                connectWalletBtn.classList.add('connected');
+                
+                showNotification('Wallet connected successfully!', 'success');
+                debugLog('Wallet connected', mockAddress);
+                
+            } catch (error) {
+                debugLog('Wallet connection failed', error);
+                showNotification('Failed to connect wallet', 'error');
+            }
+        }
+
+        // Main Research Function - FIXED
+        async function researchAirdrops() {
+            debugLog('Research button clicked');
+            
+            const walletAddress = walletAddressInput.value.trim();
+            
+            // Validation
+            if (!walletAddress) {
+                showNotification('Please enter wallet address', 'error');
+                debugLog('No wallet address provided');
+                return;
+            }
+
+            if (!walletAddress.startsWith('0x') || walletAddress.length < 20) {
+                showNotification('Please enter valid Ethereum address', 'error');
+                debugLog('Invalid wallet address format', walletAddress);
+                return;
+            }
+
+            if (isResearching) {
+                debugLog('Research already in progress');
+                return;
+            }
+
+            isResearching = true;
+
+            // UI Updates
+            loadingSection.style.display = 'block';
+            resultsSection.style.display = 'none';
+            researchBtn.disabled = true;
+            researchBtn.textContent = 'Researching...';
+            debugInfo.style.display = 'block';
+
+            // Start loading animation
+            startLoadingAnimation();
+
+            try {
+                debugLog('Starting research process...');
+                debugLog('Backend URL:', CONFIG.BACKEND_URL);
+
+                // Call Backend API - WITH PROPER ERROR HANDLING
+                const researchData = await callResearchAPI(walletAddress);
+                
+                debugLog('Research completed successfully');
+                displayResults(researchData);
+                
+                showNotification(`Found ${researchData.found_airdrops.length} airdrop opportunities!`, 'success');
+                
+            } catch (error) {
+                debugLog('Research failed', error);
+                
+                // Fallback to demo data
+                const demoData = generateDemoData(walletAddress);
+                displayResults(demoData);
+                
+                showNotification('Using demo data - backend unavailable', 'warning');
+            } finally {
+                // Reset UI
+                loadingSection.style.display = 'none';
+                researchBtn.disabled = false;
+                researchBtn.textContent = '🔍 Research Airdrops';
+                isResearching = false;
+                resetLoadingAnimation();
+            }
+        }
+
+        // API Call Function - IMPROVED
+        async function callResearchAPI(walletAddress) {
+            debugLog('Calling backend API...');
+            
+            const requestBody = {
+                wallet_address: walletAddress,
+                timeframe_days: 30
+            };
+
+            debugLog('Request body:', requestBody);
+
+            try {
+                const response = await fetch(`${CONFIG.BACKEND_URL}
